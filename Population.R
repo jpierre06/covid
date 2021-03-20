@@ -19,7 +19,7 @@ population_world[nrow(population_world) + 1,] = c('West Bank and Gaza', '5,101,4
 # population_world[nrow(population_world) + 1,] = c('MS Zaandam', '', '')
 
 
-#name conversion
+###############Begin name conversion###############
 population_world <- population_world %>% mutate(Country_name = Country_original)
 population_world$Country_name <- gsub("United States","US", population_world$Country_name)
 population_world$Country_name <- gsub("DR Congo","Kinshasa", population_world$Country_name)
@@ -37,6 +37,9 @@ population_world$Country_name <- gsub("Taiwan","Taiwan*", population_world$Count
 
 population_world$Country_name <- iconv(population_world$Country_name, from="UTF-8", to="latin2//TRANSLIT")
 
+###############End name conversion###############
+
+
 
 #casting values
 population_world$Population <- as.numeric(gsub(",", "", population_world$Population))
@@ -47,12 +50,130 @@ population_world$Land_area <- as.numeric(gsub(",", "", population_world$Land_are
 population_world$sk_population = seq.int(nrow(population_world))
 
 
-#save file
+
+###############Begin Create information by Region###############
+
+####################### Region Asia #######################
+temp_region <- data.frame(html_table(read_html("https://www.worldometers.info/population/countries-in-asia-by-population/")))
+
+#adjustment country name
+temp_region <- temp_region %>% dplyr::select (names(temp_region)[2])
+colnames(temp_region)[1] <- 'Country_original'
+temp_region[2] = 'Asian'
+colnames(temp_region)[2] <- 'Who_Region'
+
+# create dataframe region
+who_region <- temp_region
+
+
+
+####################### Region African #######################
+temp_region <- data.frame(html_table(read_html("https://www.worldometers.info/population/countries-in-africa-by-population/")))
+
+#adjustment country name, absent countries
+temp_region <- temp_region %>% dplyr::select (names(temp_region)[2])
+colnames(temp_region)[1] <- 'Country_original'
+temp_region[2] = 'African'
+colnames(temp_region)[2] <- 'Who_Region'
+
+# aggregate dataframe region
+who_region <- bind_rows(who_region, temp_region)
+
+
+
+####################### Region Europe #######################
+temp_region <- data.frame(html_table(read_html("https://www.worldometers.info/population/countries-in-europe-by-population/")))
+
+#adjustment country name, absent countries
+temp_region <- temp_region %>% dplyr::select (names(temp_region)[2])
+colnames(temp_region)[1] <- 'Country_original'
+temp_region[2] = 'Europe'
+colnames(temp_region)[2] <- 'Who_Region'
+
+# aggregate dataframe region
+who_region <- bind_rows(who_region, temp_region)
+
+
+
+####################### Region Latin America and the Caribbean #######################
+temp_region <- data.frame(html_table(read_html("https://www.worldometers.info/population/countries-in-latin-america-and-the-caribbean-by-population/")))
+
+#adjustment country name, absent countries
+temp_region <- temp_region %>% dplyr::select (names(temp_region)[2])
+colnames(temp_region)[1] <- 'Country_original'
+temp_region[2] = 'Latin America and the Caribbean'
+colnames(temp_region)[2] <- 'Who_Region'
+
+# aggregate dataframe region
+who_region <- bind_rows(who_region, temp_region)
+
+
+
+####################### Region Northern America #######################
+temp_region <- data.frame(html_table(read_html("https://www.worldometers.info/population/countries-in-northern-america-by-population/")))
+
+#adjustment country name, absent countries
+temp_region <- temp_region %>% dplyr::select (names(temp_region)[2])
+colnames(temp_region)[1] <- 'Country_original'
+temp_region[2] = 'Northern America'
+colnames(temp_region)[2] <- 'Who_Region'
+
+# aggregate dataframe region
+who_region <- bind_rows(who_region, temp_region)
+
+
+
+####################### Region Oceania #######################
+temp_region <- data.frame(html_table(read_html("https://www.worldometers.info/population/countries-in-oceania-by-population/")))
+
+#adjustment country name, absent countries
+temp_region <- temp_region %>% dplyr::select (names(temp_region)[2])
+colnames(temp_region)[1] <- 'Country_original'
+temp_region[2] = 'Oceania'
+colnames(temp_region)[2] <- 'Who_Region'
+
+# aggregate dataframe region
+who_region <- bind_rows(who_region, temp_region)
+
+
+#include absent countries
+#https://countrymeters.info/en/Kosovo
+#https://worldpopulationreview.com/countries/palestine-population/
+who_region[nrow(who_region) + 1,] = c('Kosovo', 'Europe')
+who_region[nrow(who_region) + 1,] = c('West Bank and Gaza', 'Asian')
+who_region[nrow(who_region) + 1,] = c('Saint Barthelemy', 'Latin America and the Caribbean')
+
+
+
+
+###############End Create information by Region###############
+
+
+###############Begin join country and region###############
+
+#join list x confirmed, recovered and deceased
+population_world = left_join (
+  x = population_world, 
+  y = who_region, 
+  by = c('Country_original' = 'Country_original'))
+
+
+###############End join country and region###############
+
+
+
+###############Begin save file###############
 write.csv(x = population_world, 
           file = "data/population_world.csv", 
           fileEncoding = "UTF-8",
           row.names = FALSE)
 
+
+
+###############End save file###############
+
 #delete dataframes
 rm(population_world)
 rm(p_w)
+rm(who_region)
+rm(temp_region)
