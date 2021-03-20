@@ -1,5 +1,6 @@
 #user defined functions
 
+#download from zio file
 updateData <- function(forceUpdate = FALSE) {
   
   if(forceUpdate){
@@ -8,17 +9,71 @@ updateData <- function(forceUpdate = FALSE) {
 
   } else {
 
-    # Download data from Johns Hopkins (https://github.com/CSSEGISandData/COVID-19) if the data is older than 0.5h
+    # Download data from Johns Hopkins (https://github.com/CSSEGISandData/COVID-19) if the data is older than 1h
     if (!dir_exists("data/download")) {
       dir.create('data/download')
       downloadGithubData()
-    } else if ((!file.exists("data/download/covid19_data.zip")) || (as.double(Sys.time() - file_info("data/download/covid19_data.zip")$change_time, units = "hours") > 1)) {
+    } else if ((!file.exists("data/download/covid19_data.zip")) || (as.double(Sys.time() - file_info("data/download/covid19_data.zip")$change_time, units = "hours") >= 1)) {
       downloadGithubData()
     }
     
   }
   
 }
+
+# download defined files
+updateDataFile <- function(forceUpdate = FALSE) {
+  
+	confirmed_url = "https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_confirmed_global.csv"
+
+	deaths_url = "https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_deaths_global.csv"
+
+	recovered_url = "https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_recovered_global.csv"
+
+	
+  if(forceUpdate){
+    
+    downloadGithubDataFile(confirmed_url, "data/download/time_series_covid19_confirmed_global.csv")
+
+    downloadGithubDataFile(deaths_url, "data/download/time_series_covid19_deaths_global.csv")
+
+    downloadGithubDataFile(recovered_url, "data/download/time_series_covid19_recovered_global.csv")
+
+
+  } else {
+
+    # Download data from Johns Hopkins (https://github.com/CSSEGISandData/COVID-19) if the data is older than 1h
+    if (!dir_exists("data/download")) {
+      dir.create('data/download')
+    } 
+
+	if ((!file.exists("data/download/time_series_covid19_confirmed_global.csv")) || (as.double(Sys.time() - file_info("data/download/time_series_covid19_confirmed_global.csv")$change_time, units = "hours") >= 1)) {
+		downloadGithubDataFile(confirmed_url, "data/download/time_series_covid19_confirmed_global.csv")
+    }
+    
+	if ((!file.exists("data/download/time_series_covid19_deaths_global.csv")) || (as.double(Sys.time() - file_info("data/download/time_series_covid19_deaths_global.csv")$change_time, units = "hours") >= 1)) {
+		downloadGithubDataFile(deaths_url, "data/download/time_series_covid19_deaths_global.csv")
+    }
+    
+	if ((!file.exists("data/download/time_series_covid19_recovered_global.csv")) || (as.double(Sys.time() - file_info("data/download/time_series_covid19_recovered_global.csv")$change_time, units = "hours") >= 1)) {
+		downloadGithubDataFile(recovered_url, "data/download/time_series_covid19_recovered_global.csv")
+    }
+    
+  }
+  
+}
+
+
+
+downloadGithubDataFile <- function(source_url, dest_file) {
+
+    download.file(
+    url      = source_url,
+    destfile = dest_file
+  )  
+}
+
+
 
 
 

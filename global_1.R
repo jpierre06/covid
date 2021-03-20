@@ -7,7 +7,7 @@ source("ud_functions.R", local = T)
 
 
 # Update with start of app
-updateData()
+updateDataFile()
 
 #########################begin cumulated based#########################
 
@@ -539,8 +539,10 @@ rm(data_covid19_date, data_confirmed_sub, data_recovered_sub, data_deceased_sub)
 rm(country_confirmed_d0, country_deceased_d0)
 rm(data_covid19_d0)
 rm(downloadGithubData)
+rm(downloadGithubDataFile)
 rm(capFirst, sourceDirectory, unzipTimeSeries, unzipDateDefined)
 rm(updateData)
+rm(updateDataFile)
 rm(data_covid19, data_covid19_daily, data_covid19_general, list_country)
 rm(population, date_csv)
 rm(temp_date)
