@@ -1,3 +1,6 @@
+# define work directory 
+setwd('C:/OneDrive for Business/Estudo/Covid19_Cubo')
+
 #local functions
 source("load_library.R", local = T)
 source("utils.R", local = T)
@@ -27,17 +30,26 @@ data_confirmed = data_confirmed %>%
 data_confirmed = data_confirmed %>% 
   filter(., `Country/Region` != 'Diamond Princess' )
 
+data_confirmed = data_confirmed %>% 
+  filter(., `Country/Region` != 'Summer Olympics 2020' )
+
 data_deceased = data_deceased %>% 
   filter(., `Country/Region` != 'MS Zaandam' )
 
 data_deceased = data_deceased %>% 
   filter(., `Country/Region` != 'Diamond Princess' )
 
+data_deceased = data_deceased %>% 
+  filter(., `Country/Region` != 'Summer Olympics 2020' )
+
 data_recovered = data_recovered %>% 
   filter(., `Country/Region` != 'MS Zaandam' )
 
 data_recovered = data_recovered %>% 
   filter(., `Country/Region` != 'Diamond Princess' )
+
+data_recovered = data_recovered %>% 
+  filter(., `Country/Region` != 'Summer Olympics 2020' )
 
 
 
@@ -153,9 +165,12 @@ data_covid19 = left_join (
 colnames(data_covid19)[9] = 'date_deceased_d0'
 
 data_covid19$confirmed_days = as.integer(data_covid19$Date - data_covid19$date_confirmed_d0)
+data_covid19$confirmed_days = coalesce(data_covid19$confirmed_days,0L)
+
 data_covid19$deceased_days =  as.integer(data_covid19$Date - data_covid19$date_deceased_d0)
 data_covid19$deceased_days = coalesce(data_covid19$deceased_days,0L)
 
+# delete columns
 data_covid19$date_confirmed_d0 <- NULL 
 data_covid19$date_deceased_d0 <- NULL
 
@@ -548,3 +563,4 @@ rm(population, date_csv)
 rm(temp_date)
 rm(initialDate, lastDate, workDate)
 rm(errorTemp, errorTransformation)
+
