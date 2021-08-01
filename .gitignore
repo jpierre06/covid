@@ -2,7 +2,7 @@
 .ipynb_checkpoints/
 
 # ignorar pasta com os dashboard
-dashboard/
+dashboard/outros/
 
 # ignorar pasta de dados
 data/
